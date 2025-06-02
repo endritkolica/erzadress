@@ -118,4 +118,73 @@ window.addEventListener('scroll', () => {
                 formMessage.style.color = 'red';
             });
     });
+})();
+
+// Magical Sparkle Effect in Hero Section
+(function() {
+    const canvas = document.getElementById('magic-sparkles');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let width = 0, height = 0;
+    let sparkles = [];
+    const NUM_SPARKLES = 24;
+
+    function resize() {
+        width = canvas.offsetWidth;
+        height = canvas.offsetHeight;
+        canvas.width = width;
+        canvas.height = height;
+    }
+
+    function randomColor() {
+        return `rgba(255,255,255,${0.7 + Math.random() * 0.3})`;
+    }
+
+    function createSparkle() {
+        return {
+            x: Math.random() * width,
+            y: Math.random() * height,
+            r: 0.7 + Math.random() * 1.7,
+            alpha: 0.5 + Math.random() * 0.5,
+            dx: (Math.random() - 0.5) * 0.2,
+            dy: (Math.random() - 0.5) * 0.2,
+            color: randomColor(),
+            twinkle: Math.random() * Math.PI * 2
+        };
+    }
+
+    function drawSparkle(s) {
+        ctx.save();
+        ctx.globalAlpha = s.alpha * (0.7 + 0.3 * Math.sin(s.twinkle));
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, 2 * Math.PI);
+        ctx.fillStyle = s.color;
+        ctx.shadowColor = '#fff';
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        for (let s of sparkles) {
+            s.x += s.dx;
+            s.y += s.dy;
+            s.twinkle += 0.05 + Math.random() * 0.03;
+            if (s.x < 0 || s.x > width || s.y < 0 || s.y > height) {
+                Object.assign(s, createSparkle());
+            }
+            drawSparkle(s);
+        }
+        requestAnimationFrame(animate);
+    }
+
+    function init() {
+        resize();
+        sparkles = Array.from({length: NUM_SPARKLES}, createSparkle);
+        animate();
+    }
+
+    window.addEventListener('resize', resize);
+    setTimeout(init, 100); // Wait for layout
 })(); 
